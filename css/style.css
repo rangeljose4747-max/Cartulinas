@@ -108,7 +108,7 @@ body { background: #0a0a0a; }
     transform: translateY(-2px);
 }
 
-/* ===== TRANSICIONES PARA COLOR DINÁMICO DEL CARRITO ===== */
+/* Transiciones para color dinámico del carrito */
 #cartBadge,
 #floatingCartBtn,
 header button i {
