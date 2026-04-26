@@ -744,7 +744,7 @@ function updateCartUI() {
 function sendWhatsApp() {
     if (!cart.length) return;
     const phone = '584122891366';
-    let msg = '🛒 *PEDIDO DE CARTULINAS GUICAR 2026*\n\n';
+    let msg = '🛒 *CARTULINAS PREMIUM INVERSIONES GUICAR 2025*\n\n';
     const grouped = {};
     cart.forEach(item => {
         const key = `${item.subName} (${item.subSize})`;
