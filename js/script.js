@@ -10,8 +10,8 @@ const D = [
         tabColor: 'bg-sky-500',
         accent: '#38BDF8',
         gradient: 'from-sky-500/15 to-blue-500/15',
-        minQty: 1,              // mínimo 1 paquete
-        packSize: 5,            // cada paquete contiene 5 láminas
+        minQty: 1,
+        packSize: 5,
         category: 'laminas',
         subs: [
             {
@@ -216,7 +216,7 @@ const D = [
     // SECCIÓN 2: PAQUETES TAMAÑO CARTA (con unidades por paquete)
     {
         id: 'tamano-carta',
-        tabName: 'PAQUETES TAMAÑO CARTA',
+        tabName: 'CARTULINAS PAQUETES TAMAÑO CARTA',
         tabIcon: 'file',
         tabColor: 'bg-emerald-500',
         accent: '#10B981',
@@ -388,8 +388,8 @@ const D = [
 
 // ==================== COLOR DINÁMICO DEL CARRITO ====================
 function getCartColor(totalUnits) {
-    let t = Math.min(totalUnits, 100) / 100; // 0 → verde, 1 → naranja
-    let hue = 150 - (t * 125);  // 150° (verde) a 25° (naranja)
+    let t = Math.min(totalUnits, 100) / 100;
+    let hue = 150 - (t * 125);
     let sat = 70 + (t * 20);
     let light = 45 + (t * 10);
     return `hsl(${hue}, ${sat}%, ${light}%)`;
@@ -411,20 +411,6 @@ function isLight(hex) {
 function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
-}
-
-// ==================== RENDER TABS ====================
-function renderTabs() {
-    const tabBar = document.getElementById('tabBar');
-    if (!tabBar) return;
-    tabBar.innerHTML = D.map(g => `
-        <button id="tab-${g.id}" onclick="scrollToGrp('${g.id}')" class="cat-tab flex items-center gap-2 px-3.5 py-2 rounded-xl border border-white/[0.06] flex-shrink-0 transition-all">
-            <div class="w-2 h-2 rounded-full ${g.tabColor}"></div>
-            <span class="text-xs font-medium text-zinc-300 whitespace-nowrap">${g.tabName}</span>
-            ${g.minQty ? `<span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-md bg-orange-500/15 text-orange-400">mín.${g.minQty} paq</span>` : ''}
-        </button>
-    `).join('');
-    lucide.createIcons();
 }
 
 // ==================== RENDER SECCIONES ====================
@@ -487,7 +473,7 @@ function renderSubContent(sub, defaultMinQty, category, packSize) {
                             <div class="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center shadow-md"><i data-lucide="plus" class="w-3.5 h-3.5 text-black"></i></div>
                         </div>
                     </div>
-                    <span class="text-[10px] text-zinc-300 mt-0.5">${escapeHtml(col.n)}</span>
+                    <span class="text-sm text-zinc-300 mt-0.5 font-medium">${escapeHtml(col.n)}</span>
                 </div>`;
         }).join('');
     } else if (sub.type === 'patterns') {
@@ -500,7 +486,7 @@ function renderSubContent(sub, defaultMinQty, category, packSize) {
                             <div class="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center shadow-md"><i data-lucide="plus" class="w-3.5 h-3.5 text-black"></i></div>
                         </div>
                     </div>
-                    <span class="text-[10px] text-zinc-300 mt-0.5">${escapeHtml(pat.n)}</span>
+                    <span class="text-sm text-zinc-300 mt-0.5 font-medium">${escapeHtml(pat.n)}</span>
                 </div>`;
         }).join('');
     } else if (sub.type === 'bitono') {
@@ -513,34 +499,63 @@ function renderSubContent(sub, defaultMinQty, category, packSize) {
                             <div class="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center"><i data-lucide="plus" class="w-3.5 h-3.5 text-black"></i></div>
                         </div>
                     </div>
-                    <span class="text-[10px] text-zinc-300">${escapeHtml(col.n)}</span>
+                    <span class="text-sm text-zinc-300 font-medium">${escapeHtml(col.n)}</span>
                 </div>`;
         }).join('');
     } else if (sub.type === 'simple') {
-        return sub.items.map(it => {
-            let unitsPerItem = 1;
-            if (isLaminasPaquete) unitsPerItem = packSize;
-            else if (it.unitsPerPackage) unitsPerItem = it.unitsPerPackage;
-            else if (it.unitsPerUnit) unitsPerItem = it.unitsPerUnit;
-            return `<div class="flex items-center gap-4 p-3 rounded-xl glass cursor-pointer transition-all hover:bg-white/[0.08] package-item" onclick="addToCart('${escapeHtml(sub.name)}', '${escapeHtml(sub.size)}', '${it.n}', '${escapeHtml(it.n)}', '${it.h}', ${finalMinQty}, ${isPackageItem}, '${category}', ${unitsPerItem})">
-                <div class="w-12 h-12 rounded-lg flex-shrink-0 border ${isLight(it.h) ? 'border-zinc-700' : ''}" style="background-color:${it.h}"></div>
-                <div class="flex-1 text-left">
-                    <p class="text-sm font-medium text-white">${escapeHtml(it.n)}</p>
-                    <p class="text-[10px] text-zinc-400">${it.size || sub.size}</p>
-                    ${isLaminasPaquete ? `<p class="text-[9px] text-orange-400">1 paquete = 5 und</p>` : (finalMinQty ? `<p class="text-[9px] text-orange-400">Mín. ${finalMinQty} und</p>` : '')}
-                </div>
-                <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><i data-lucide="plus" class="w-4 h-4 text-zinc-400"></i></div>
-            </div>`;
-        }).join('');
+        const isPackageSimple = sub.items.some(it => it.unitsPerPackage || it.unitsPerUnit);
+        if (isPackageSimple) {
+            return sub.items.map(it => {
+                let unitsPerItem = 1;
+                if (isLaminasPaquete) unitsPerItem = packSize;
+                else if (it.unitsPerPackage) unitsPerItem = it.unitsPerPackage;
+                else if (it.unitsPerUnit) unitsPerItem = it.unitsPerUnit;
+                const sizeText = it.size || sub.size;
+                const label = it.unitsPerPackage ? `Paquete x${it.unitsPerPackage} und` : (it.unitsPerUnit ? `Unidad` : '');
+                return `<div class="package-item flex items-center gap-4 p-3 rounded-xl glass cursor-pointer transition-all hover:bg-white/[0.08]" onclick="addToCart('${escapeHtml(sub.name)}', '${escapeHtml(sub.size)}', '${it.n}', '${escapeHtml(it.n)}', '${it.h}', ${finalMinQty}, ${isPackageItem}, '${category}', ${unitsPerItem})">
+                    <div class="w-12 h-12 rounded-lg flex-shrink-0 border ${isLight(it.h) ? 'border-zinc-700' : ''}" style="background-color:${it.h}"></div>
+                    <div class="flex-1 text-left">
+                        <div class="fila-producto">
+                            <span class="producto-nombre">${escapeHtml(it.n)}</span>
+                            <span class="producto-desc">— ${escapeHtml(sizeText)}</span>
+                            ${label ? `<span class="producto-desc text-emerald-400">(${label})</span>` : ''}
+                            ${isLaminasPaquete ? `<span class="producto-desc text-orange-400">(1 paquete = 5 und)</span>` : ''}
+                            ${finalMinQty && !isLaminasPaquete ? `<span class="producto-desc text-orange-400">(Mín. ${finalMinQty} und)</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><i data-lucide="plus" class="w-4 h-4 text-zinc-400"></i></div>
+                </div>`;
+            }).join('');
+        } else {
+            return sub.items.map(it => {
+                let unitsPerItem = 1;
+                if (isLaminasPaquete) unitsPerItem = packSize;
+                else if (it.unitsPerPackage) unitsPerItem = it.unitsPerPackage;
+                else if (it.unitsPerUnit) unitsPerItem = it.unitsPerUnit;
+                return `<div class="flex items-center gap-4 p-3 rounded-xl glass cursor-pointer transition-all hover:bg-white/[0.08] package-item" onclick="addToCart('${escapeHtml(sub.name)}', '${escapeHtml(sub.size)}', '${it.n}', '${escapeHtml(it.n)}', '${it.h}', ${finalMinQty}, ${isPackageItem}, '${category}', ${unitsPerItem})">
+                    <div class="w-12 h-12 rounded-lg flex-shrink-0 border ${isLight(it.h) ? 'border-zinc-700' : ''}" style="background-color:${it.h}"></div>
+                    <div class="flex-1 text-left">
+                        <p class="text-sm font-medium text-white">${escapeHtml(it.n)}</p>
+                        <p class="text-[10px] text-zinc-400">${it.size || sub.size}</p>
+                        ${isLaminasPaquete ? `<p class="text-[9px] text-orange-400">1 paquete = 5 und</p>` : (finalMinQty ? `<p class="text-[9px] text-orange-400">Mín. ${finalMinQty} und</p>` : '')}
+                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><i data-lucide="plus" class="w-4 h-4 text-zinc-400"></i></div>
+                </div>`;
+            }).join('');
+        }
     } else if (sub.type === 'packages') {
         return sub.items.map(it => {
             const unitsPerItem = it.unitsPerPackage || 1;
-            return `<div class="flex items-center gap-4 p-3 rounded-xl glass cursor-pointer transition-all hover:bg-white/[0.08] package-item" onclick="addToCart('${escapeHtml(sub.name)}', '${escapeHtml(it.size) || escapeHtml(sub.size)}', '${it.n}', '${escapeHtml(it.n)}', '${it.h}', 0, true, '${category}', ${unitsPerItem})">
+            const sizeText = it.size || sub.size;
+            const label = `Paquete x${unitsPerItem} und`;
+            return `<div class="package-item flex items-center gap-4 p-3 rounded-xl glass cursor-pointer transition-all hover:bg-white/[0.08]" onclick="addToCart('${escapeHtml(sub.name)}', '${escapeHtml(sub.size)}', '${it.n}', '${escapeHtml(it.n)}', '${it.h}', 0, true, '${category}', ${unitsPerItem})">
                 <div class="w-12 h-12 rounded-lg flex-shrink-0 border ${isLight(it.h) ? 'border-zinc-700' : ''}" style="background-color:${it.h}"></div>
                 <div class="flex-1 text-left">
-                    <p class="text-sm font-medium text-white">${escapeHtml(it.n)}</p>
-                    <p class="text-[10px] text-zinc-400">${it.size || sub.size}</p>
-                    <p class="text-[9px] text-emerald-400">1 paquete</p>
+                    <div class="fila-producto">
+                        <span class="producto-nombre">${escapeHtml(it.n)}</span>
+                        <span class="producto-desc">— ${escapeHtml(sizeText)}</span>
+                        <span class="producto-desc text-emerald-400">(${label})</span>
+                    </div>
                 </div>
                 <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><i data-lucide="plus" class="w-4 h-4 text-zinc-400"></i></div>
             </div>`;
@@ -570,26 +585,6 @@ function toggleSub(sk) {
 function scrollToGrp(grpId) {
     const section = document.getElementById(`section-${grpId}`);
     if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
-    const tab = document.getElementById(`tab-${grpId}`);
-    if (tab) tab.classList.add('active');
-}
-
-function setupSpy() {
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const gid = entry.target.id.replace('section-', '');
-                document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
-                const tab = document.getElementById(`tab-${gid}`);
-                if (tab) tab.classList.add('active');
-            }
-        });
-    }, { rootMargin: '-20% 0px -60% 0px' });
-    D.forEach(g => {
-        const el = document.getElementById(`section-${g.id}`);
-        if (el) observer.observe(el);
-    });
 }
 
 // ==================== CARRITO ====================
@@ -638,7 +633,6 @@ function updateCartUI() {
     const totalUnits = cart.reduce((sum, item) => sum + (item.qty * (item.unitsPerItem || 1)), 0);
     const totalPackages = cart.reduce((sum, item) => sum + item.qty, 0);
     
-    // COLOR DINÁMICO
     const cartColor = getCartColor(totalUnits);
     const badgeEl = document.getElementById('cartBadge');
     if (badgeEl) {
@@ -656,7 +650,6 @@ function updateCartUI() {
         else cartIcon.style.color = '';
     }
     
-    // UI básica
     const fbadge = document.getElementById('floatingBadge');
     const emptyDiv = document.getElementById('cartEmpty');
     const itemsDiv = document.getElementById('cartItems');
@@ -683,7 +676,6 @@ function updateCartUI() {
     countSpan.textContent = `(${totalPackages})`;
     totalSpan.textContent = `${totalUnits}`;
 
-    // Desglose por categoría
     const categorias = { laminas: { paq: 0, und: 0 }, paquetes: { paq: 0, und: 0 }, carton: { und: 0 } };
     cart.forEach(item => {
         const units = item.qty * (item.unitsPerItem || 1);
@@ -704,7 +696,7 @@ function updateCartUI() {
     summaryLines.innerHTML = `<div class="flex flex-wrap items-center gap-2 text-xs text-zinc-300">${desgloseHtml} <span class="ml-auto text-amber-400">${cart.length} producto(s) distinto(s)</span></div>`;
     lucide.createIcons();
 
-    // Renderizar items del carrito
+    // 👇 CARRITO CON TEXTOS MÁS GRANDES Y CLAROS
     itemsDiv.innerHTML = cart.map((item, idx) => {
         const totalItemUnits = item.qty * (item.unitsPerItem || 1);
         let textoUnidad = '';
@@ -716,19 +708,19 @@ function updateCartUI() {
             textoUnidad = `${item.qty} unidad(es)`;
         }
         let catBadge = '';
-        if (item.category === 'laminas') catBadge = '<span class="text-[8px] bg-sky-500/20 text-sky-300 px-1.5 py-0.5 rounded-full">Lámina</span>';
-        else if (item.category === 'paquetes') catBadge = '<span class="text-[8px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded-full">Paquete</span>';
-        else if (item.category === 'carton') catBadge = '<span class="text-[8px] bg-orange-500/20 text-orange-300 px-1.5 py-0.5 rounded-full">Cartón</span>';
+        if (item.category === 'laminas') catBadge = '<span class="cat-badge text-[8px] bg-sky-500/20 text-sky-300 px-1.5 py-0.5 rounded-full">Lámina</span>';
+        else if (item.category === 'paquetes') catBadge = '<span class="cat-badge text-[8px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded-full">Paquete</span>';
+        else if (item.category === 'carton') catBadge = '<span class="cat-badge text-[8px] bg-orange-500/20 text-orange-300 px-1.5 py-0.5 rounded-full">Cartón</span>';
         
         return `<div class="flex items-center gap-3 p-3 rounded-xl glass bg-black/40 slide-in">
             <div class="w-9 h-9 rounded-lg border ${isLight(item.hex) ? 'border-white/30' : ''}" style="background:${item.hex}"></div>
             <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
-                    <p class="text-sm font-medium text-white truncate">${item.name}</p>
+                    <p class="cart-item-name text-base font-medium text-white truncate">${item.name}</p>
                     ${catBadge}
                 </div>
-                <p class="text-[10px] text-zinc-500">${escapeHtml(item.subName)} · ${escapeHtml(item.subSize)}</p>
-                <p class="text-[9px] text-emerald-400">${textoUnidad}</p>
+                <p class="cart-item-detail text-sm text-zinc-400">${escapeHtml(item.subName)} · ${escapeHtml(item.subSize)}</p>
+                <p class="cart-item-units text-sm text-emerald-400">${textoUnidad}</p>
             </div>
             <div class="flex items-center gap-1">
                 <button onclick="changeQty(${idx}, -1)" class="w-6 h-6 rounded-md bg-white/5 hover:bg-white/10 flex items-center justify-center"><i data-lucide="minus" class="w-3 h-3 text-white"></i></button>
@@ -824,9 +816,7 @@ document.addEventListener('DOMContentLoaded', () => {
     openSubs['tamano-carta-1'] = true;
     openSubs['carton-kilo-0'] = true;
     openSubs['carton-kilo-1'] = true;
-    renderTabs();
     renderAll();
-    setupSpy();
     lucide.createIcons();
 });
 
